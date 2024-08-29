@@ -54,6 +54,27 @@ features=features.replace('',np.nan)
 # ======================= CONVERSÃO DE VAR PARA TIPOS APROPRIADOS =======================
 for col in num_vars:
     features[col]=features[col].astype('float')
-
 for col in cat_vars:
     features[col]=features[col].astype('category')
+
+# ======================= SELEÇÃO DE VARIÁVEIS =======================
+# Objetivo: definir as vars que serão utilizados no modelos
+features.isna()
+empty_entries_per_column=features.isna().sum(axis=0) # contagem de linha snulas
+
+#graficos para ajudar a definir o fator de corte
+fig, (ax1,ax2) = plt.subplots(1,2)
+ax1.boxplot(empty_entries_per_column)
+ax2.hist(empty_entries_per_column)
+median=empty_entries_per_column.median()
+print(median)
+
+#definindo limite (threshold)
+threshold = len(features) * 0.25
+keep_vars= np.array(features.columns[(empty_entries_per_column <= threshold)])
+
+num_vars=[var for var in num_vars if var in keep_vars]
+cat_vars=[var for var in cat_vars if var in keep_vars]
+
+#serão utilizadas:
+len(cat_vars),len(num_vars)
