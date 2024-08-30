@@ -1,6 +1,6 @@
 # ======================= OBJETIVO =======================
 # A ideia geral envolve a criação de um modelo para predição dessas 3 variáveis com base 
-# nos dados fornecidos por essa base de dados real de uma empresa de telecomunicação francesa.
+# nos dados fornecidos por uma base de dados real de uma empresa de telecomunicação francesa.
 
 #	Possibilidade do cliente fazer cancelamento da conta
 #	Tendência de comprar novos produtos ou serviços
@@ -60,7 +60,7 @@ for col in cat_vars:
 # ======================= SELEÇÃO DE VARIÁVEIS =======================
 # Objetivo: definir as vars que serão utilizados no modelos
 features.isna()
-empty_entries_per_column=features.isna().sum(axis=0) # contagem de linha snulas
+empty_entries_per_column=features.isna().sum(axis=0) # contagem de linhas nulas
 
 #graficos para ajudar a definir o fator de corte
 fig, (ax1,ax2) = plt.subplots(1,2)
@@ -78,3 +78,20 @@ cat_vars=[var for var in cat_vars if var in keep_vars]
 
 #serão utilizadas:
 len(cat_vars),len(num_vars)
+
+#preenchimento de valores nulos restantes
+for col in num_vars:
+    col_mean= features[col].mean()
+    features[col]=features[col].fillna(col_mean)
+
+for col in cat_vars:
+    features[col]=features[col].cat.add_categories('missing')
+    features[col]=features[col].fillna('missing')
+
+# ======================= LIMPANDO VARIÁVEIS COM MUITAS CATEGORIAS =======================
+n_categories_per_features=features[cat_vars].apply(lambda x: len(set(x))) # retorna o numero unico da categoria para cada var
+plt.hist(n_categories_per_features)
+cat_vars= np.array(n_categories_per_features[n_categories_per_features <= 1400].index) # variaveis com menos quantidade de null
+
+# ======================= CONSOLIDANDO DATAFRAME =======================
+features=features[list(num_vars)+ list(cat_vars)]
