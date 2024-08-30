@@ -76,9 +76,6 @@ keep_vars= np.array(features.columns[(empty_entries_per_column <= threshold)])
 num_vars=[var for var in num_vars if var in keep_vars]
 cat_vars=[var for var in cat_vars if var in keep_vars]
 
-#serão utilizadas:
-len(cat_vars),len(num_vars)
-
 #preenchimento de valores nulos restantes
 for col in num_vars:
     col_mean= features[col].mean()
